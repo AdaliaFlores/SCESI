@@ -419,3 +419,199 @@ git pull origin <rama>
 > 💡 `git pull` es equivalente a hacer `git fetch` + `git merge` en un solo paso.
 
 ---
+# CLASE 4 - REMOTE, SSH MÚLTIPLE Y CHECKOUT
+
+---
+
+## Git Remote
+
+`git remote` es el comando que gestiona las conexiones con repositorios remotos. Le dice a Git local **dónde enviar** o **de dónde traer** información.
+
+### Comandos útiles
+
+| Comando | Descripción |
+|---|---|
+| `git remote -v` | Muestra las URLs exactas a donde apunta tu repositorio |
+| `git remote add <apodo> <url>` | Vincula tu repo local con uno en la nube |
+| `git remote set-url <apodo> <url>` | Cambia la URL a donde apunta tu repositorio |
+
+---
+
+## SSH Múltiple
+
+### ¿Por qué necesitarías múltiples llaves SSH?
+
+Si tienes **más de una cuenta de GitHub** (por ejemplo, una personal y una del trabajo), cada cuenta necesita su propia llave SSH.
+
+Recuerda que una llave SSH es como un **túnel seguro** entre tu computadora y GitHub. El problema es que si usas la misma llave para dos cuentas distintas, GitHub no sabe cuál cuenta eres tú en cada momento — y los túneles chocan.
+
+> 🔑 **Analogía:** Es como tener dos casas con dos cerraduras distintas. Una llave abre tu casa, la otra abre la del trabajo. No querrías que la misma llave abriera ambas puertas.
+
+La solución es crear **una llave SSH por cuenta** y decirle a Git cuál llave usar para cada una mediante un archivo de configuración.
+
+---
+
+## Configurar SSH Múltiple
+
+### Paso 1 — Generar la nueva llave SSH
+
+Ya tienes una llave para tu cuenta principal (`~/.ssh/id_ed25519`). Ahora generamos una segunda llave con un nombre diferente usando el flag `-f`:
+
+```bash
+ssh-keygen -t ed25519 -C "micorreo@gmail.com" -f ~/.ssh/id_miname
+```
+
+- `-f ~/.ssh/id_miname` → define el nombre y ubicación del archivo de la nueva llave
+
+Esto crea dos archivos:
+- `~/.ssh/id_miname` → llave **privada** (nunca la compartas)
+- `~/.ssh/id_miname.pub` → llave **pública** (esta la pegas en GitHub)
+
+> Recuerda agregar la llave pública (`id_miname.pub`) a la cuenta secundaria en **GitHub → Settings → SSH Keys**.
+
+---
+
+### Paso 2 — Crear el archivo de configuración SSH
+
+Este es el paso clave. Creamos (o editamos) el archivo `~/.ssh/config` para decirle a SSH **qué llave usar según el destino**:
+
+```bash
+nano ~/.ssh/config
+```
+Ejemplo:
+
+```
+# Cuenta principal (la de siempre)
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+
+# Cuenta secundaria
+Host github-miname
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_miname
+```
+
+**¿Qué significa cada línea?**
+
+| Campo | Significado |
+|---|---|
+| `Host` | El **apodo o alias** de la conexión. Es lo que escribes en la terminal después de `git@`. Para la cuenta principal usas `github.com`; para la secundaria inventas un alias como `github-miname` |
+| `HostName` | La dirección real del servidor. Siempre será `github.com` para ambas cuentas |
+| `User` | El usuario del sistema remoto. Para GitHub **siempre es `git`**, sin excepción |
+| `IdentityFile` | La ruta a la llave privada que se usará para ese `Host` |
+
+> 💡 El `Host` es solo un apodo. Tanto `github.com` como `github-miname` se conectan al mismo servidor (`github.com`), pero con **llaves distintas**. Al cambiar el apodo, SSH sabe qué llave usar.
+
+---
+
+### Paso 3 — Verificar que funciona
+Para verificar si funciona ejecutamos el comando:
+```bash
+ssh -T git@github.com        # verifica cuenta principal
+ssh -T git@github-miname     # verifica cuenta secundaria
+```
+
+Si todo está bien, verás un mensaje como:
+```
+Hi TuUsuario! You've successfully authenticated...
+```
+
+---
+
+### Paso 4 — Clonar o conectar repositorios con el host correcto
+
+> ⚠️ **Esto es lo que más se olvida.** Al clonar o vincular un repositorio de la cuenta secundaria, debes usar el **apodo del Host**, no `github.com` directamente.
+
+Clonar un repo de la cuenta secundaria:
+
+```bash
+# ✅ Correcto — usa el alias del Host
+git clone git@github-miname:usuario/repo.git
+
+# ❌ Incorrecto — SSH no sabe qué llave usar
+git clone git@github.com:usuario/repo.git
+```
+
+Si ya tienes un repositorio conectado y quieres cambiarlo a la cuenta secundaria:
+
+```bash
+git remote set-url origin git@github-miname:usuario/repo.git
+```
+
+---
+
+## Configuraciones locales por repositorio
+
+Las configuraciones locales se aplican **solo al repositorio actual** y tienen prioridad sobre las globales.
+
+```bash
+# Configuración LOCAL (solo este repo)
+git config user.name "Mi Nombre"
+git config user.email "micorreo@gmail.com"
+
+# Configuración GLOBAL (todos los repos)
+git config --global user.name "Mi Nombre"
+git config --global user.email "micorreo@gmail.com"
+```
+
+> 💡 Esto es muy útil con múltiples cuentas: configuras el email de trabajo en los repos del trabajo, y el personal en los tuyos, sin que interfieran.
+
+---
+
+## Git Checkout
+
+`git checkout` mueve el **HEAD** (el puntero que indica en qué punto de la historia estás) hacia un commit específico o hacia otra rama.
+
+### ¿Para qué sirve?
+
+| Uso | Descripción |
+|---|---|
+| **Inspeccionar** | Ver cómo era el código en un commit antiguo |
+| **Restaurar** | Recuperar archivos que borraste o modificaste |
+| **Experimentar** | Probar cambios sin afectar la rama principal |
+| **Cambiar de rama** | Moverte entre ramas (ej: de `main` a `desarrollo`) |
+
+---
+
+## El estado "Detached HEAD"
+
+Normalmente el HEAD apunta a una **rama** (que avanza con cada commit). Cuando haces checkout a un commit antiguo, el HEAD apunta directamente a ese **commit fijo** — sin rama. A esto se le llama estado *detached HEAD* (cabeza desacoplada).
+
+> 🎬 **Analogía:** Es como viajar al pasado. Puedes ver todo lo que había, incluso tomar notas, pero si te vas sin "encarnar" en una rama, todo lo que escribiste desaparece al volver al presente.
+
+### Ir a un commit antiguo y volver
+
+```bash
+# Viajar a un commit específico (entras en detached HEAD)
+git checkout <hash_del_commit>
+
+# Volver al presente (a tu rama principal)
+git checkout <rama>
+```
+
+### ¿Qué pasa si hiciste commits en detached HEAD?
+
+Esos commits no pertenecen a ninguna rama y Git los descartará eventualmente. Para no perderlos, crea una rama antes de salir:
+
+```bash
+git checkout <hash_del_commit_creado>
+git checkout -b rama_nueva
+```
+
+---
+
+## Buenas prácticas con checkout
+
+**1. No trabajes mucho tiempo en Detached HEAD**  
+Si vas a escribir más de un par de líneas de código, crea una rama de una vez con `git checkout -b nombre-rama`.
+
+**2. Limpia tu directorio de trabajo antes de viajar**  
+Haz commit (o guarda con `git stash`) de lo que estás haciendo antes de hacer checkout a otro punto. Si tienes cambios sin guardar, Git puede negarse a dejarte viajar para no perderlos.
+
+**3. Úsalo para aprender**  
+Hacer checkout a commits antiguos de proyectos grandes es una excelente forma de entender cómo evolucionó el código con el tiempo.
+
+---
