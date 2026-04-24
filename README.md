@@ -34,7 +34,7 @@ Como solución, Linus Torvalds desarrolló Git en pocas semanas, priorizando vel
 Verificar si Git está instalado:
 ```bash
 git --version
-
+```
 ---
 
 # CLASE 2 - STATES Y COMMITS
@@ -242,3 +242,180 @@ y validación de credenciales
 
 - Primera línea → título
 - Siguientes líneas → descripción detallada
+
+#### Ver historial de commits
+
+Para verlo de manera resumida:
+
+```bash
+git log --online
+```
+#### Tamaño maximo que puedes subir a Github
+
+Lo maximo que puedes subir es 100 MB
+
+---
+
+# CLASE 3 - GITHUB Y SSH
+
+---
+
+## ¿Qué es GitHub?
+
+GitHub es una plataforma en la nube y red social para desarrolladores que permite alojar, gestionar y colaborar en proyectos de software utilizando Git.
+
+---
+
+## Git vs GitHub
+
+| | Git | GitHub |
+|---|---|---|
+| **Qué es** | Sistema de control de versiones local | Plataforma en la nube |
+| **Función** | Crea los "puntos de guardado" (commits) | Almacena y comparte esos commits |
+| **Dónde vive** | En tu computadora | En internet |
+
+> GitHub **usa** Git, pero no son lo mismo. Git puede existir sin GitHub, pero GitHub no existiría sin Git.
+
+---
+
+## SSH vs HTTPS
+
+### HTTPS
+
+Al clonar y usar un repositorio con HTTPS, GitHub te pedirá autenticarte **cada vez** que hagas un `push` o `pull`, incluyendo el uso de tokens de acceso personal. Esto puede volverse tedioso en el día a día.
+
+### SSH
+
+Con SSH configuras un par de claves criptográficas en tu máquina. Le entregas tu **clave pública** a GitHub, y desde ese momento tu computadora se autentica automáticamente sin necesidad de ingresar credenciales.
+
+> 💡 **Recomendación:** Usa siempre SSH para trabajar con GitHub de forma más cómoda y segura.
+
+---
+
+## Configuración SSH
+
+Ejecuta los siguientes comandos desde tu terminal (Linux/Mac) o Git Bash (Windows):
+
+### 1. Generar el par de claves SSH
+
+```bash
+ssh-keygen -t ed25519 -C "tu-correo@email.com"
+```
+
+- `-t ed25519` → tipo de algoritmo de cifrado (el más moderno y seguro)
+- `-C` → comentario para identificar la clave (usa el correo asociado a GitHub)
+
+Cuando te pregunte dónde guardar la clave, presiona **Enter** para usar la ubicación por defecto (`~/.ssh/id_ed25519`).
+
+### 2. Copiar la clave pública
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+Copia todo el contenido que aparece. Luego ve a **GitHub → Settings → SSH and GPG keys → New SSH key** y pégala.
+
+### 3. Verificar la conexión
+
+```bash
+ssh -T git@github.com
+```
+
+Si todo salió bien, verás un mensaje como:
+Hi TuUsuario! You've successfully authenticated...
+
+---
+
+## Crear un repositorio en GitHub
+
+1. Ve a tu sección de repositorios: `https://github.com/TuUsuario?tab=repositories`
+2. Haz clic en **"New"**
+3. Escribe el nombre del repositorio y, opcionalmente, una descripción
+4. Haz clic en **"Create repository"**
+
+---
+
+## Conectar un repositorio local con GitHub
+
+> ⚠️ **Requisito previo:** ya debes haber ejecutado `git init` y tener al menos un commit (`git add . + git commit -m "Initial commit"`).
+
+### 1. Vincular el repositorio remoto
+
+```bash
+git remote add origin git@github.com:TuUsuario/TuRepo.git
+```
+
+- `remote` → URL que apunta a tu repositorio en GitHub
+- `origin` → apodo (alias) que Git le da por defecto a esa URL. Puedes cambiarlo, pero `origin` es la convención universal
+
+### 2. Renombrar la rama principal a `main`
+
+```bash
+git branch -M main
+```
+
+Cambia el nombre de la rama por defecto de `master` a `main` (estándar actual de GitHub).
+
+### 3. Subir los commits a GitHub
+
+```bash
+git push -u origin main
+```
+
+- `-u` → establece `origin main` como destino por defecto, así en el futuro solo necesitas escribir `git push`
+
+---
+
+## Clonar un repositorio de GitHub
+
+```bash
+git clone git@github.com:TuUsuario/TuRepo.git
+```
+
+### Si lo clonaste por error con HTTPS
+
+Usa este comando para cambiar la URL remota a SSH y evitar autenticarte en cada operación:
+
+```bash
+git remote set-url origin git@github.com:TuUsuario/TuRepo.git
+```
+
+> 💡 Este mismo comando sirve también si quieres **cambiar el repositorio remoto** al que está conectado tu proyecto.
+
+### Ver a qué repositorio remoto estás conectado
+
+```bash
+git remote -v
+```
+
+---
+
+## Subir y bajar cambios
+
+### Subir cambios → `git push`
+
+```bash
+git push origin <rama>
+```
+
+| Parte | Significado |
+|---|---|
+| `git push` | "Empuja" tus commits hacia el servidor |
+| `origin` | El servidor remoto (GitHub) |
+| `<rama>` | La rama que quieres subir (ej: `main`) |
+
+### Bajar cambios → `git pull`
+
+```bash
+git pull origin <rama>
+```
+
+| Parte | Significado |
+|---|---|
+| `git pull` | "Trae" los commits del servidor a tu máquina |
+| `origin` | El servidor remoto (GitHub) |
+| `<rama>` | La rama de la que quieres traer cambios |
+
+> 💡 `git pull` es equivalente a hacer `git fetch` + `git merge` en un solo paso.
+
+---
