@@ -615,3 +615,142 @@ Haz commit (o guarda con `git stash`) de lo que estás haciendo antes de hacer c
 Hacer checkout a commits antiguos de proyectos grandes es una excelente forma de entender cómo evolucionó el código con el tiempo.
 
 ---
+# CLASE 5 - RAMAS Y GITFLOW BÁSICO
+
+---
+
+## ¿Qué son las ramas?
+
+Una rama es una **bifurcación del código** que permite crear un camino paralelo de desarrollo. Esto es especialmente útil para que varios desarrolladores trabajen al mismo tiempo sin pisarse el código entre sí.
+
+> 💡 Imagina que el proyecto es una línea de tiempo. Una rama es como crear una línea de tiempo alternativa donde puedes experimentar y desarrollar, sin afectar la línea principal.
+
+---
+
+## Git Branch
+
+`git branch` es el comando para gestionar las ramas del proyecto.
+
+```bash
+# Ver todas las ramas (marca con * la rama actual)
+git branch
+
+# Crear una rama nueva desde la rama actual
+git branch <nombre-rama>
+
+# Eliminar una rama
+git branch -D <nombre-rama>
+```
+
+---
+
+## Cambiar de rama: checkout vs switch
+
+### git checkout (clásico)
+
+```bash
+# Cambiar a una rama existente
+git checkout <rama>
+
+# Crear una rama y moverse a ella directamente
+git checkout -b <rama>
+```
+
+### git switch 
+
+```bash
+# Cambiar a una rama existente
+git switch <rama>
+
+# Crear una rama y moverse a ella directamente
+git switch -c <rama>
+```
+
+### ¿Cuál usar?
+
+| | `git checkout` | `git switch` |
+|---|---|---|
+| **Cambiar de rama** | ✅ | ✅ |
+| **Crear y cambiar de rama** | ✅ `-b` | ✅ `-c` |
+| **Viajar a commits antiguos** | ✅ | ❌ |
+| **Restaurar archivos** | ✅ | ❌ |
+| **Riesgo de Detached HEAD** | ⚠️ Sí | ❌ No |
+
+> 💡 `git checkout` es multiusos pero puede confundir. `git switch` hace una sola cosa y la hace bien. Para moverte entre ramas, ambos sirven — pero `git switch` es más seguro e intuitivo.
+
+> ⚠️ Antes de cambiar de rama asegúrate de no tener archivos en estado `modified`, `untracked` o `staged`, o Git no te dejará cambiar.
+
+---
+
+## GitFlow básico
+
+GitFlow es un **flujo de trabajo** que establece reglas claras sobre cómo nombrar y usar las ramas. Su objetivo es mantener el proyecto ordenado y que cualquier persona que se una pueda entender rápidamente el estado del código.
+
+### Las ramas de GitFlow
+
+#### `main`
+- Contiene el código en **producción** (lo que los usuarios finales están usando).
+- Solo recibe código probado y validado.
+- Cada merge aquí debería representar una versión estable.
+
+#### `develop`
+- Es la rama de **pre-producción** y el día a día del equipo.
+- Contiene funcionalidades ya desarrolladas pero que aún se están probando antes de pasar a `main`.
+- Es la rama desde la que nacen la mayoría de las ramas de apoyo.
+
+---
+
+### Ramas de apoyo
+
+#### `feature/*`
+Para desarrollar **nuevas funcionalidades**.
+
+- Nace de: `develop`
+- Muere en: `develop`
+- Convención de nombres:
+
+```
+feature/nombre-descriptivo-en-ingles
+feature/add-search-bar
+feature/new-user-form
+feature/sum-function
+```
+
+#### `release/*`
+Para preparar y probar el **lanzamiento de una nueva versión** (QA).
+
+- Nace de: `develop`
+- Muere en: `develop` y `main`
+- Convención de nombres:
+
+```
+release/v1.0.0
+release/v2.1.0-beta
+```
+
+#### `hotfix/*`
+Para corregir **bugs urgentes en producción**. Nace directamente de `main` porque `develop` puede tener código inestable y no se puede esperar.
+
+- Nace de: `main`
+- Muere en: `main` y `develop`
+- Convención de nombres:
+
+```
+hotfix/login-authentication-error
+hotfix/fix-database-connection-leak
+hotfix/security-patch-v1.0.2
+```
+
+---
+
+### Resumen de GitFlow
+
+| Rama | Nace de | Muere en | Propósito |
+|---|---|---|---|
+| `main` | — | Jamás (eterna) | Código en producción |
+| `develop` | `main` | Jamás (eterna) | El día a día del equipo |
+| `feature/*` | `develop` | `develop` | Desarrollar una funcionalidad |
+| `release/*` | `develop` | `main` y `develop` | Preparar y probar una versión |
+| `hotfix/*` | `main` | `main` y `develop` | Arreglar un bug urgente en producción |
+
+---
