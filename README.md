@@ -754,3 +754,169 @@ hotfix/security-patch-v1.0.2
 | `hotfix/*` | `main` | `main` y `develop` | Arreglar un bug urgente en producción |
 
 ---
+# CLASE 6 - FETCH, PULL, MERGE Y CONFLICTOS
+
+---
+
+## Git Fetch
+
+`git fetch` consulta el repositorio remoto y te **informa si hubo cambios** en la rama y sus ramas hijas, pero no los descarga ni los aplica. Es como asomarte a ver si hay correo nuevo sin abrirlo.
+
+```bash
+git fetch
+```
+
+> 💡 Úsalo antes de hacer `git pull` para saber qué cambios te esperan antes de aplicarlos.
+
+---
+
+## Git Pull
+
+`git pull` **descarga y aplica** todos los cambios del repositorio remoto a tu rama local. Siempre úsalo especificando `origin` y el nombre de la rama para evitar problemas.
+
+```bash
+git pull origin <rama>
+```
+
+> ⚠️ Antes de fusionar ramas, siempre haz `git fetch` + `git pull` para asegurarte de que tienes el código más reciente.
+
+---
+
+## Git Push
+
+`git push` **sube tus commits** al repositorio remoto.
+
+```bash
+git push origin <rama>
+```
+
+### Primera vez en un repositorio ajeno
+
+Si el repositorio no es tuyo y es la primera vez que subes tu rama, usa el flag `-u` para que Git registre la rama remota y no pida permisos cada vez:
+
+```bash
+git push -u origin <rama>
+```
+
+---
+
+## Git Merge
+
+`git merge` **fusiona dos ramas** para que ambas compartan sus commits. Se ejecuta estando posicionado en la rama que va a *recibir* los cambios.
+
+```bash
+# Primero posiciónate en la rama destino
+git checkout develop
+
+# Luego fusiona la rama que quieres traer
+git merge <rama>
+```
+
+#### Sin `--no-ff` (fast-forward)
+
+Cuando `develop` no tuvo ningún commit mientras trabajabas en tu `feature`, Git dice: *"no hay nada que fusionar realmente, simplemente muevo el puntero"*. El resultado es que el historial queda como si nunca hubiera existido una rama separada:
+
+```
+develop ----A----B----C----D----E
+                              ↑
+                       (antes era feature)
+```
+
+Los commits D y E eran de `feature`, pero ahora parecen parte de `develop` directamente. **No hay rastro de que existió una rama.** A esto se le llama "aplanar" el historial.
+
+### El flag `--no-ff` (recomendado)
+
+`--no-ff` significa *no fast-forward*. Sin este flag, Git puede hacer una fusión silenciosa que no deja rastro en el historial. Con `--no-ff` se **fuerza la creación de un commit de merge**, preservando el historial de ramas aunque las elimines después.
+
+```
+develop ----A----B-----------M
+                 \          /
+feature           C----D----E
+```
+
+```bash
+git merge --no-ff feature/header-landing
+```
+
+| | Sin `--no-ff` | Con `--no-ff` |
+|---|---|---|
+| **Historial** | Se aplana, se pierde el rastro | Se conserva la bifurcación |
+| **Commit de merge** | No siempre se crea | Siempre se crea |
+| **Recomendado en GitFlow** | ❌ | ✅ |
+
+> 💡 Una vez que fusionas una rama y ya no harás más cambios en ella, puedes eliminarla con `git branch -D <rama>`.
+
+---
+
+## Conflictos
+
+Un conflicto ocurre cuando **dos personas modificaron la misma parte del mismo archivo** y Git no sabe con cuál versión quedarse. En ese caso, Git pausa el merge y te pide que resuelvas el conflicto manualmente.
+
+### ¿Cómo se ve un conflicto en el archivo?
+
+```
+<<<<<<< HEAD
+// Tu código (donde tú estás)
+=======
+// El código que viene de la otra rama
+>>>>>>> feature/header-landing
+```
+
+- Todo lo que está entre `<<<<<<< HEAD` y `=======` es **tu versión**
+- Todo lo que está entre `=======` y `>>>>>>> feature/...` es **la versión que quieres fusionar**
+
+### ¿Cómo resolverlo con nano?
+
+1. Abre el archivo en conflicto:
+```bash
+nano <archivo-con-conflicto>
+```
+
+2. Edita manualmente el archivo: elimina las líneas `<<<<<<<`, `=======` y `>>>>>>>` y deja solo el código correcto (el tuyo, el de ellos, o una combinación de ambos).
+
+3. Guarda y cierra nano:
+```
+Ctrl + O  →  Enter  →  Ctrl + X
+```
+
+4. Agrega el archivo resuelto al stage y confirma:
+```bash
+git add .
+git commit
+```
+
+---
+
+## Flujo de trabajo completo (sin Pull Requests)
+
+Este es el flujo que seguirás en el día a día para fusionar tu rama de trabajo en `develop`:
+
+```bash
+# 1. Moverse a la rama destino
+git checkout develop
+
+# 2. Verificar si hay cambios remotos
+git fetch
+
+# 3. Traer los cambios más recientes
+git pull origin develop
+
+# 4. Fusionar tu rama de trabajo
+git merge --no-ff <tu-rama>
+
+# 5. Si hay conflictos, resolverlos manualmente en nano,
+#    luego agregar los archivos resueltos
+git add .
+
+# 6. Confirmar el merge
+git commit
+# (en nano: Ctrl + O → Enter → Ctrl + X)
+
+# 7. Eliminar la rama ya fusionada
+git branch -D <tu-rama>
+
+# 8. Subir los cambios a GitHub
+git push origin develop
+```
+
+---
