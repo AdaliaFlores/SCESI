@@ -23,6 +23,8 @@ Funciona como un sistema de "checkpoints", permitiendo volver a versiones anteri
 
 ## Origen de Git
 Git fue creado por Linus Torvalds en 2005.
+<img src="./images/linus.jpg" width="150px" align="right" />
+
 Antes, el desarrollo del kernel de Linux se gestionaba mediante correos electrónicos. Luego se utilizó una herramienta llamada BitKeeper, pero debido a restricciones en su uso, se dejó de utilizar.
 
 Como solución, Linus Torvalds desarrolló Git en pocas semanas, priorizando velocidad, seguridad y trabajo distribuido.
