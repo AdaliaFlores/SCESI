@@ -1,11 +1,12 @@
 # GIT
 
 **Nombre:** Adalia Flores Escobar  
+---
 **Clase:** CLASE 1  
-
 ---
 
 ## ¿Qué es Git?
+<img src="./images/Git_icon.png" width="110px" align="right" />
 Git es un sistema de control de versiones distribuido que permite registrar y gestionar cambios en archivos a lo largo del tiempo.
 
 Funciona como un sistema de "checkpoints", permitiendo volver a versiones anteriores del proyecto cuando sea necesario.
@@ -22,7 +23,6 @@ Funciona como un sistema de "checkpoints", permitiendo volver a versiones anteri
 
 ## Origen de Git
 Git fue creado por Linus Torvalds en 2005.
-
 Antes, el desarrollo del kernel de Linux se gestionaba mediante correos electrónicos. Luego se utilizó una herramienta llamada BitKeeper, pero debido a restricciones en su uso, se dejó de utilizar.
 
 Como solución, Linus Torvalds desarrolló Git en pocas semanas, priorizando velocidad, seguridad y trabajo distribuido.
