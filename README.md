@@ -295,7 +295,7 @@ Al clonar y usar un repositorio con HTTPS, GitHub te pedirá autenticarte **cada
 
 ### SSH
 
-<img src="./images/ssh.webp" width="200px" align="right" />
+<img src="./images/ssh.webp" width="150px" align="right" />
 
 Con SSH configuras un par de claves criptográficas en tu máquina. Le entregas tu **clave pública** a GitHub, y desde ese momento tu computadora se autentica automáticamente sin necesidad de ingresar credenciales.
 
@@ -631,6 +631,8 @@ Hacer checkout a commits antiguos de proyectos grandes es una excelente forma de
 ---
 
 ## ¿Qué son las ramas?
+
+<img src="./images/git branch.png" width="100px" align="right" />
 
 Una rama es una **bifurcación del código** que permite crear un camino paralelo de desarrollo. Esto es especialmente útil para que varios desarrolladores trabajen al mismo tiempo sin pisarse el código entre sí.
 
