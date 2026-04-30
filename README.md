@@ -920,3 +920,134 @@ git push origin develop
 ```
 
 ---
+# CLASE 7 - PULL REQUESTS Y PROTECCIÓN DE RAMAS
+
+---
+
+## ¿Por qué no hacer merge directamente?
+
+Hasta ahora confiábamos en que cada persona fusionara su propio código sin errores, pero esto es arriesgado en equipos reales porque:
+
+- Alguien puede subir código con bugs a `main` o `develop`
+- No hay revisión de lo que se fusiona
+- No queda registro de quién aprobó qué
+
+La solución es usar **Pull Requests** junto con **reglas de protección de ramas**.
+
+---
+
+## ¿Qué es un Pull Request?
+
+Un Pull Request (PR) es una **solicitud formal para fusionar tu rama** en otra rama protegida. En lugar de hacer el merge directamente, le dices al equipo: *"terminé mi trabajo, ¿alguien lo revisa y aprueba antes de fusionarlo?"*
+
+Esto permite que el equipo:
+- **Vea exactamente qué archivos cambiaste**
+- **Deje comentarios o correcciones** antes de aprobar
+- **Apruebe o rechace** los cambios
+- Mantenga un **historial de quién revisó qué**
+
+---
+
+## Protección de ramas en GitHub
+
+### ¿Qué es?
+
+Son reglas que configuras en GitHub para evitar que alguien haga merge en ramas importantes (`main`, `develop`) sin pasar por un Pull Request y obtener las aprobaciones necesarias.
+
+### Cómo configurarlo
+
+1. Ve a tu repositorio en GitHub
+2. **Settings → Branches → Add branch ruleset**
+3. En **Target branches** escribe la rama que quieres proteger (ej: `main`, `develop`)
+4. Activa la regla **"Require a pull request before merging"**
+5. En **Required approvals** configura el número mínimo de aprobaciones
+
+> 💡 **¿Cuántas aprobaciones pedir?** La convención común es la **mitad del equipo más uno**. Por ejemplo, en un equipo de 4 personas, se requieren 3 aprobaciones. Esto garantiza que siempre haya mayoría.
+
+---
+
+## Flujo de trabajo con Pull Requests
+
+### En tu máquina local
+
+```bash
+# 1. Asegúrate de estar en develop y tener lo más reciente
+git checkout develop
+git fetch
+git pull origin develop
+
+# 2. Crea tu rama de trabajo
+git checkout -b feature/mi-funcionalidad
+
+# 3. Trabaja, haz commits...
+git add .
+git commit -m "feat: add mi funcionalidad"
+
+# 4. Sube tu rama a GitHub
+#    Usamos -u porque es la primera vez que subimos esta rama
+git push -u origin feature/mi-funcionalidad
+```
+
+> ⚠️ El flag `-u` es necesario la primera vez que subes una rama que no existe aún en el repositorio remoto, incluso si eres colaborador del proyecto.
+
+### En GitHub
+
+5. GitHub detecta que subiste una rama nueva y te muestra un botón **"Compare & pull request"**. Haz clic en él.
+
+6. Completa el Pull Request:
+   - **Título:** describe brevemente qué hiciste (sigue las buenas prácticas de commits)
+   - **Descripción:** explica con más detalle los cambios, por qué los hiciste y cualquier cosa relevante para el revisor
+   - Puedes ver exactamente **qué archivos modificaste** en la pestaña "Files changed"
+
+7. Haz clic en **"Create Pull Request"**
+
+> 🔒 Gracias a las reglas de protección, **no podrás hacer merge tú solo**. Deberás esperar las aprobaciones configuradas.
+
+### Proceso de revisión
+
+8. Los administradores o compañeros de equipo recibirán una notificación del PR
+9. Pueden revisar los cambios archivo por archivo y **dejar comentarios** en líneas específicas del código
+10. Cada revisor puede:
+    - **Aprobar** → los cambios están bien
+    - **Solicitar cambios** → hay algo que corregir antes de aprobar
+    - **Comentar** → dejar una observación sin bloquear ni aprobar
+
+11. Una vez que se alcanza el número mínimo de aprobaciones, el botón de **"Merge pull request"** se habilita y el administrador puede fusionar la rama
+
+---
+
+## .gitkeep
+
+Cuando necesitas subir una **carpeta vacía** a GitHub tienes un problema: Git no rastrea carpetas, solo archivos. Si una carpeta no tiene archivos, Git la ignora completamente.
+
+La solución es crear un archivo llamado `.gitkeep` dentro de la carpeta:
+
+```bash
+touch carpeta-vacia/.gitkeep
+```
+
+Este archivo no tiene contenido ni función real — su único propósito es darle a Git algo que rastrear para que la carpeta aparezca en el repositorio.
+
+> 💡 Es una convención de la comunidad, no un comando de Git. El nombre `.gitkeep` es solo un estándar que todos reconocen.
+
+---
+
+## Resumen del flujo completo
+
+```
+Tu máquina                          GitHub
+─────────────────────────────────────────────────────
+git checkout -b feature/x
+  → trabajas y haces commits
+git push -u origin feature/x  ──→  Creas el Pull Request
+                                    (título + descripción)
+                                         ↓
+                                   Equipo revisa y comenta
+                                         ↓
+                                   Se alcanzan las aprobaciones
+                                   requeridas
+                                         ↓
+                                   Admin hace merge ✅
+```
+
+---
