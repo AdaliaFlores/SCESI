@@ -103,6 +103,7 @@ node_modules/
 ---
 
 ### 2. STAGE AREA (Área de preparación)
+<img src="./images/workD.png" width="150px" align="right" />
 
 Es donde seleccionas los archivos que quieres incluir en el próximo commit.
 
