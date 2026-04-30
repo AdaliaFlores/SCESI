@@ -133,7 +133,7 @@ git restore --staged nombreArchivo
 
 ### 3. REPOSITORIO LOCAL (Commits)
 
-<img src="./images/git reposiroty.webp" width="250px" align="right" />
+<img src="./images/git repository.webp" width="250px" align="right" />
 Aquí se guardan los cambios confirmados con un identificador único (ID).
 
 #### Crear un commit
@@ -273,6 +273,7 @@ GitHub es una plataforma en la nube y red social para desarrolladores que permit
 ---
 
 ## Git vs GitHub
+<img src="./images/gitvs.png" width="250px" align="center" />
 
 | | Git | GitHub |
 |---|---|---|
