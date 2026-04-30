@@ -44,7 +44,7 @@ git --version
 ---
 
 ## Estados de Git
-
+<img src="./images/estadosGit.png" width="400px" align="center" />
 Git maneja tres áreas principales:
 
 ### 1. DIRECTORIO DE TRABAJO (Working Directory)
