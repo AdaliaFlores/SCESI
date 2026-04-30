@@ -964,6 +964,8 @@ La solución es usar **Pull Requests** junto con **reglas de protección de rama
 
 ## ¿Qué es un Pull Request?
 
+<img src="./images/pullrequest.png" width="350px" align="center" />
+
 Un Pull Request (PR) es una **solicitud formal para fusionar tu rama** en otra rama protegida. En lugar de hacer el merge directamente, le dices al equipo: *"terminé mi trabajo, ¿alguien lo revisa y aprueba antes de fusionarlo?"*
 
 Esto permite que el equipo:
