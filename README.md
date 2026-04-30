@@ -436,6 +436,8 @@ git pull origin <rama>
 
 ## Git Remote
 
+<img src="./images/git remote.png" width="150px" align="right" />
+
 `git remote` es el comando que gestiona las conexiones con repositorios remotos. Le dice a Git local **dónde enviar** o **de dónde traer** información.
 
 ### Comandos útiles
