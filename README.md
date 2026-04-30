@@ -133,6 +133,7 @@ git restore --staged nombreArchivo
 
 ### 3. REPOSITORIO LOCAL (Commits)
 
+<img src="./images/git reposiroty.webp" width="250px" align="right" />
 Aquí se guardan los cambios confirmados con un identificador único (ID).
 
 #### Crear un commit
