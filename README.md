@@ -289,9 +289,13 @@ GitHub es una plataforma en la nube y red social para desarrolladores que permit
 
 ### HTTPS
 
+<img src="./images/https.jpg" width="150px" align="right" />
+
 Al clonar y usar un repositorio con HTTPS, GitHub te pedirá autenticarte **cada vez** que hagas un `push` o `pull`, incluyendo el uso de tokens de acceso personal. Esto puede volverse tedioso en el día a día.
 
 ### SSH
+
+<img src="./images/ssh.webp" width="200px" align="right" />
 
 Con SSH configuras un par de claves criptográficas en tu máquina. Le entregas tu **clave pública** a GitHub, y desde ese momento tu computadora se autentica automáticamente sin necesidad de ingresar credenciales.
 
