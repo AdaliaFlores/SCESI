@@ -775,6 +775,8 @@ hotfix/security-patch-v1.0.2
 
 ---
 
+<img src="./images/pushfetchmerge.webp" width="350px" align="center" />
+
 ## Git Fetch
 
 `git fetch` consulta el repositorio remoto y te **informa si hubo cambios** en la rama y sus ramas hijas, pero no los descarga ni los aplica. Es como asomarte a ver si hay correo nuevo sin abrirlo.
@@ -789,6 +791,8 @@ git fetch
 
 ## Git Pull
 
+<img src="./images/pull.webp" width="350px" align="right" />
+
 `git pull` **descarga y aplica** todos los cambios del repositorio remoto a tu rama local. Siempre úsalo especificando `origin` y el nombre de la rama para evitar problemas.
 
 ```bash
@@ -800,6 +804,7 @@ git pull origin <rama>
 ---
 
 ## Git Push
+<img src="./images/push.jpg" width="350px" align="right" />
 
 `git push` **sube tus commits** al repositorio remoto.
 
@@ -818,6 +823,8 @@ git push -u origin <rama>
 ---
 
 ## Git Merge
+
+<img src="./images/git push merge.png" width="350px" align="right" />
 
 `git merge` **fusiona dos ramas** para que ambas compartan sus commits. Se ejecuta estando posicionado en la rama que va a *recibir* los cambios.
 
@@ -866,6 +873,8 @@ git merge --no-ff feature/header-landing
 ---
 
 ## Conflictos
+
+<img src="./images/gitconfl.jpg" width="250px" align="center" />
 
 Un conflicto ocurre cuando **dos personas modificaron la misma parte del mismo archivo** y Git no sabe con cuál versión quedarse. En ese caso, Git pausa el merge y te pide que resuelvas el conflicto manualmente.
 
