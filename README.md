@@ -48,6 +48,7 @@ git --version
 Git maneja tres áreas principales:
 
 ### 1. DIRECTORIO DE TRABAJO (Working Directory)
+<img src="./images/workDi.png" width="150px" align="right" />
 
 Es donde estás trabajando directamente con tus archivos.
 
