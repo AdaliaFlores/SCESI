@@ -436,7 +436,7 @@ git pull origin <rama>
 
 ## Git Remote
 
-<img src="./images/git remote.png" width="150px" align="right" />
+<img src="./images/git remote.png" width="200px" align="center" />
 
 `git remote` es el comando que gestiona las conexiones con repositorios remotos. Le dice a Git local **dónde enviar** o **de dónde traer** información.
 
@@ -634,7 +634,7 @@ Hacer checkout a commits antiguos de proyectos grandes es una excelente forma de
 
 ## ¿Qué son las ramas?
 
-<img src="./images/git branch.png" width="100px" align="right" />
+<img src="./images/git branch.webp" width="100px" align="right" />
 
 Una rama es una **bifurcación del código** que permite crear un camino paralelo de desarrollo. Esto es especialmente útil para que varios desarrolladores trabajen al mismo tiempo sin pisarse el código entre sí.
 
