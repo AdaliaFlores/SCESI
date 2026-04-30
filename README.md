@@ -634,7 +634,7 @@ Hacer checkout a commits antiguos de proyectos grandes es una excelente forma de
 
 ## ¿Qué son las ramas?
 
-<img src="./images/git branch.webp" width="100px" align="right" />
+<img src="./images/git branch.webp" width="300px" align="center" />
 
 Una rama es una **bifurcación del código** que permite crear un camino paralelo de desarrollo. Esto es especialmente útil para que varios desarrolladores trabajen al mismo tiempo sin pisarse el código entre sí.
 
@@ -698,6 +698,8 @@ git switch -c <rama>
 ---
 
 ## GitFlow básico
+
+<img src="./images/gitflow.png" width="250px" align="right" />
 
 GitFlow es un **flujo de trabajo** que establece reglas claras sobre cómo nombrar y usar las ramas. Su objetivo es mantener el proyecto ordenado y que cualquier persona que se una pueda entender rápidamente el estado del código.
 
