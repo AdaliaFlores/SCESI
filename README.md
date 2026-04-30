@@ -103,7 +103,7 @@ node_modules/
 ---
 
 ### 2. STAGE AREA (Área de preparación)
-<img src="./images/workD.png" width="150px" align="right" />
+<img src="./images/workD.webp" width="300px" align="right" />
 
 Es donde seleccionas los archivos que quieres incluir en el próximo commit.
 
@@ -261,11 +261,12 @@ Lo maximo que puedes subir es 100 MB
 ---
 
 # CLASE 3 - GITHUB Y SSH
+<img src="./images/git ssh.png" width="250px" align="center" />
 
 ---
 
 ## ¿Qué es GitHub?
-
+<img src="./images/githubIcon.png" width="80px" align="right" />
 GitHub es una plataforma en la nube y red social para desarrolladores que permite alojar, gestionar y colaborar en proyectos de software utilizando Git.
 
 ---
