@@ -1079,3 +1079,259 @@ git push -u origin feature/x  ──→  Creas el Pull Request
 ```
 
 ---
+
+#CLASE 8 GIT STASH, GIT DIFF y que hacer en Conflictos en PRs
+
+---
+
+## 1. git stash
+
+### ¿Qué es?
+
+`git stash` guarda temporalmente los cambios que **no has commiteado**, dejando tu working directory limpio. Es útil cuando necesitas cambiar de rama sin perder tu trabajo en progreso.
+
+> **Analogía:** es como una gaveta donde metes tu trabajo a medias. Cierras la gaveta, haces otra cosa, y luego la abres para continuar exactamente donde lo dejaste.
+
+---
+
+### Comandos principales
+
+#### Guardar cambios
+
+```bash
+git stash                          # guarda con mensaje automático
+git stash push -m "descripcion"    # guarda con mensaje personalizado
+git stash push -u -m "descripcion" # incluye archivos untracked (nuevos)
+```
+
+#### Ver la lista de stashes
+
+```bash
+git stash list
+
+# Salida de ejemplo:
+# stash@{0}: On main: fix login form
+# stash@{1}: On feature/api: work in progress
+```
+
+#### Recuperar cambios
+
+```bash
+git stash pop              # aplica el último stash Y lo elimina de la lista
+git stash apply            # aplica el último stash pero LO MANTIENE
+git stash apply stash@{2}  # aplica un stash específico por índice
+```
+
+> **`pop` vs `apply`:** usa `pop` cuando ya no necesites volver al stash (lo más común). Usa `apply` cuando quieras aplicarlo en varias ramas o conservarlo como respaldo.
+
+#### Eliminar stashes
+
+```bash
+git stash drop             # elimina el último stash
+git stash drop stash@{1}   # elimina un stash específico
+git stash clear            # elimina TODOS los stashes ⚠️
+```
+
+#### Ver qué hay dentro de un stash
+
+```bash
+git stash show             # resumen de archivos modificados
+git stash show -p          # muestra el diff completo (línea a línea)
+git stash show stash@{1}   # inspecciona un stash específico
+```
+
+#### Crear una rama nueva desde un stash
+
+```bash
+git stash branch nombre-rama stash@{0}
+# Crea la rama, aplica el stash y lo elimina automáticamente
+```
+
+---
+
+### Caso de uso real
+
+Estás trabajando en un bug en `feature/login` y tu jefe te pide revisar algo urgente en `main`. Haces `git stash`, cambias a `main`, revisas, vuelves a `feature/login` y recuperas tu trabajo con `git stash pop`. Sin perder nada.
+
+---
+
+## 2. git diff
+
+### ¿Qué es?
+
+`git diff` muestra las diferencias entre versiones de archivos. Las líneas con `+` son adiciones y las líneas con `-` son eliminaciones.
+
+---
+
+### Casos de uso más comunes
+
+#### Ver cambios no staged (sin `git add`)
+
+```bash
+git diff
+# Cambios en archivos modificados que aún NO agregaste al index
+```
+
+#### Ver cambios staged (ya con `git add`, listos para commit)
+
+```bash
+git diff --staged
+git diff --cached    # equivalente, misma cosa
+```
+
+#### Ver todos los cambios (staged + unstaged)
+
+```bash
+git diff HEAD
+# Compara tu working directory completo contra el último commit
+```
+
+#### Comparar dos ramas
+
+```bash
+git diff main..feature/login
+
+# Solo ver qué archivos son distintos (sin el detalle):
+git diff --name-only main..feature/login
+
+# Con resumen de líneas agregadas/eliminadas:
+git diff --stat main..feature/login
+```
+
+#### Comparar dos commits
+
+```bash
+git diff abc1234 def5678
+git diff HEAD~3 HEAD       # hace 3 commits vs el actual
+git diff HEAD~1            # qué cambió en el último commit
+```
+
+#### Ver diferencias en un archivo específico
+
+```bash
+git diff main..feature/login -- src/auth/login.js
+git diff -- README.md
+```
+
+---
+
+### Cómo leer la salida de git diff
+
+```diff
+diff --git a/src/login.js b/src/login.js
+--- a/src/login.js       ← versión antigua
++++ b/src/login.js       ← versión nueva
+
+@@ -10,7 +10,8 @@       ← línea 10 del archivo antiguo / línea 10 del nuevo
+
+ const user = getUser();
+-if (user.active) {          ← línea eliminada (roja)
++if (user.active && user.verified) {   ← línea añadida (verde)
+   login(user);
+```
+
+---
+
+### Opciones útiles
+
+| Comando | Para qué sirve |
+|---|---|
+| `git diff --stat` | Resumen de archivos y líneas cambiadas |
+| `git diff --name-only` | Solo nombres de archivos distintos |
+| `git diff --word-diff` | Diferencias palabra a palabra (no línea a línea) |
+| `git diff -w` | Ignora cambios de espacios en blanco |
+
+---
+
+## 3. Conflictos en PRs causados por un PR previo
+
+### ¿Qué pasó?
+
+Un PR anterior fue mergeado a `main` y modificó archivos que tú también modificaste en tu rama. Git no sabe cuál versión conservar y genera un conflicto.
+
+---
+
+### Solución paso a paso
+
+#### Opción A — Rebase (recomendada, historial más limpio)
+
+```bash
+# 1. Actualiza tu main local
+git checkout main
+git pull origin main
+
+# 2. Vuelve a tu rama
+git checkout feature/mi-rama
+
+# 3. Aplica tus commits encima del main actualizado
+git rebase main
+
+# 4. Git pausará en cada conflicto. Resuélvelos en tu editor,
+#    luego continúa:
+git add archivo-resuelto.js
+git rebase --continue
+
+# 5. Sube la rama (necesita --force porque reescribió el historial)
+git push origin feature/mi-rama --force-with-lease
+```
+
+> ⚠️ Usa `--force-with-lease` en lugar de `--force` — es más seguro porque falla si alguien más subió cambios a la rama mientras tanto.
+
+#### Opción B — Merge (más sencillo, conserva historial original)
+
+```bash
+# 1. Actualiza tu main local
+git checkout main
+git pull origin main
+
+# 2. Vuelve a tu rama y haz merge de main
+git checkout feature/mi-rama
+git merge main
+
+# 3. Resuelve los conflictos, luego:
+git add archivo-resuelto.js
+git commit
+
+# 4. Sube normalmente (no necesita --force)
+git push origin feature/mi-rama
+```
+
+---
+
+### Cómo se ve un conflicto en el archivo
+
+```
+<<<<<<< HEAD (tu rama)
+const timeout = 5000;
+=======
+const timeout = 3000;
+>>>>>>> main
+```
+
+Debes elegir qué conservar (o combinar ambos) y eliminar las marcas `<<<<<<<`, `=======` y `>>>>>>>`.
+
+---
+
+### Herramientas para resolver conflictos más fácil
+
+```bash
+git mergetool          # abre la herramienta configurada (VS Code, vimdiff, etc.)
+
+# Para configurar VS Code como herramienta de merge:
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd 'code --wait $MERGED'
+```
+
+En VS Code los conflictos se ven con botones de "Accept Current Change", "Accept Incoming Change" y "Accept Both" — mucho más cómodo que editar manualmente.
+
+---
+
+### Verificar que todo quedó bien antes de pushear
+
+```bash
+git diff main..feature/mi-rama    # revisa qué cambios quedan en tu PR
+git log --oneline main..HEAD      # lista tus commits sobre main
+```
+
+---
+
