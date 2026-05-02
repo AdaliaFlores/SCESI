@@ -1096,55 +1096,50 @@ git push -u origin feature/x  ──→  Creas el Pull Request
 
 ### Comandos principales
 
-#### Guardar cambios
+#### `git stash` — Guardar cambios rápido
 
 ```bash
-git stash                          # guarda con mensaje automático
-git stash push -m "descripcion"    # guarda con mensaje personalizado
-git stash push -u -m "descripcion" # incluye archivos untracked (nuevos)
+git stash
+# Guarda todos los cambios no commiteados y limpia el working directory
 ```
 
-#### Ver la lista de stashes
+#### `git stash -m "algo"` — Guardar con descripción
+
+```bash
+git stash -m "fix parcial del login"
+# Le pones un nombre para identificarlo después fácilmente
+# Sin nombre es difícil saber qué hay en cada stash cuando tienes varios
+```
+
+#### `git stash list` — Ver todos los stashes guardados
 
 ```bash
 git stash list
 
 # Salida de ejemplo:
-# stash@{0}: On main: fix login form
-# stash@{1}: On feature/api: work in progress
+# stash@{0}: On feature/login: fix parcial del login
+# stash@{1}: On main: ajuste en estilos
+# stash@{2}: WIP on feature/api: work in progress
 ```
 
-#### Recuperar cambios
+> El número dentro de `{}` es el índice. El `stash@{0}` siempre es el más reciente.
+
+#### `git stash pop` — Recuperar el último stash
 
 ```bash
-git stash pop              # aplica el último stash Y lo elimina de la lista
-git stash apply            # aplica el último stash pero LO MANTIENE
-git stash apply stash@{2}  # aplica un stash específico por índice
+git stash pop
+# Aplica el stash@{0} (el más reciente) Y lo elimina de la lista
 ```
 
-> **`pop` vs `apply`:** usa `pop` cuando ya no necesites volver al stash (lo más común). Usa `apply` cuando quieras aplicarlo en varias ramas o conservarlo como respaldo.
+> **`pop` vs `apply`:** usa `pop` cuando ya no necesites volver al stash (lo más común). Usa `apply stash@{N}` cuando quieras aplicarlo en varias ramas o conservarlo como respaldo.
 
-#### Eliminar stashes
+#### Otros comandos útiles
 
 ```bash
-git stash drop             # elimina el último stash
+git stash apply stash@{2}  # aplica un stash específico sin eliminarlo
 git stash drop stash@{1}   # elimina un stash específico
 git stash clear            # elimina TODOS los stashes ⚠️
-```
-
-#### Ver qué hay dentro de un stash
-
-```bash
-git stash show             # resumen de archivos modificados
-git stash show -p          # muestra el diff completo (línea a línea)
-git stash show stash@{1}   # inspecciona un stash específico
-```
-
-#### Crear una rama nueva desde un stash
-
-```bash
-git stash branch nombre-rama stash@{0}
-# Crea la rama, aplica el stash y lo elimina automáticamente
+git stash show -p          # muestra el diff completo del último stash
 ```
 
 ---
@@ -1163,54 +1158,49 @@ Estás trabajando en un bug en `feature/login` y tu jefe te pide revisar algo ur
 
 ---
 
-### Casos de uso más comunes
+### Comandos principales
 
-#### Ver cambios no staged (sin `git add`)
+#### `git diff .` — Ver todos los cambios no staged
 
 ```bash
-git diff
-# Cambios en archivos modificados que aún NO agregaste al index
+git diff .
+# Muestra todos los cambios en el directorio actual que aún NO hiciste git add
+# El punto (.) indica "todo aquí", equivale a solo escribir: git diff
 ```
 
-#### Ver cambios staged (ya con `git add`, listos para commit)
+#### `git diff archivo` — Ver cambios en un archivo específico
+
+```bash
+git diff src/auth/login.js
+# Solo muestra los cambios de ese archivo, no de todo el proyecto
+# Útil cuando modificaste muchos archivos y quieres revisar uno en particular
+```
+
+#### `git diff --staged` — Ver cambios ya agregados con git add
 
 ```bash
 git diff --staged
-git diff --cached    # equivalente, misma cosa
+# Muestra los cambios que YA hiciste git add (listos para commit)
+# También funciona: git diff --cached  (son equivalentes)
 ```
 
-#### Ver todos los cambios (staged + unstaged)
+#### `git diff --staged archivo` — Staged de un archivo específico
 
 ```bash
-git diff HEAD
-# Compara tu working directory completo contra el último commit
+git diff --staged src/auth/login.js
+# Combina los dos anteriores: solo ese archivo, solo lo que ya está staged
 ```
 
-#### Comparar dos ramas
+#### `git diff rama1 rama2` — Comparar dos ramas
 
 ```bash
-git diff main..feature/login
+git diff main feature/login
+# Muestra todas las diferencias entre las dos ramas
 
-# Solo ver qué archivos son distintos (sin el detalle):
-git diff --name-only main..feature/login
-
-# Con resumen de líneas agregadas/eliminadas:
-git diff --stat main..feature/login
-```
-
-#### Comparar dos commits
-
-```bash
-git diff abc1234 def5678
-git diff HEAD~3 HEAD       # hace 3 commits vs el actual
-git diff HEAD~1            # qué cambió en el último commit
-```
-
-#### Ver diferencias en un archivo específico
-
-```bash
-git diff main..feature/login -- src/auth/login.js
-git diff -- README.md
+# Variantes útiles:
+git diff main..feature/login           # equivalente al anterior
+git diff --name-only main feature/login  # solo nombres de archivos distintos
+git diff --stat main feature/login       # resumen con conteo de líneas
 ```
 
 ---
@@ -1243,11 +1233,11 @@ diff --git a/src/login.js b/src/login.js
 
 ---
 
-## 3. Conflictos en PRs causados por un PR previo
+## 3. Qué hacer cuando aprobaron un PR distinto que tocó lo mismo que yo
 
 ### ¿Qué pasó?
 
-Un PR anterior fue mergeado a `main` y modificó archivos que tú también modificaste en tu rama. Git no sabe cuál versión conservar y genera un conflicto.
+Alguien más tenía un PR que tocó los mismos archivos que tú. Lo aprobaron y mergearon a `main` antes que el tuyo. Ahora tu PR tiene conflictos porque `main` ya tiene una versión distinta de esos archivos.
 
 ---
 
@@ -1335,3 +1325,47 @@ git log --oneline main..HEAD      # lista tus commits sobre main
 
 ---
 
+## 4. Buena práctica: borrar la rama después de mergear el PR
+
+Una vez que tu PR fue mergeado, **la rama ya cumplió su propósito**. Dejarla acumulada genera ruido en el repositorio. Lo correcto es eliminarla.
+
+### Borrar la rama remota (en GitHub)
+
+```bash
+git push origin --delete feature/mi-rama
+# Elimina la rama del servidor remoto (GitHub/GitLab)
+```
+
+> GitHub también te ofrece un botón **"Delete branch"** automáticamente después de mergear el PR. Es la forma más cómoda.
+
+### Borrar la rama local
+
+```bash
+git branch -d feature/mi-rama
+# Elimina la rama local de forma segura
+# Git te avisará si tiene commits sin mergear (-d no borra si hay riesgo)
+
+git branch -D feature/mi-rama
+# Fuerza la eliminación aunque tenga commits sin mergear ⚠️
+```
+
+### Flujo completo recomendado después de un merge
+
+```bash
+# 1. Vuelve a main y actualízalo
+git checkout main
+git pull origin main
+
+# 2. Borra la rama local
+git branch -d feature/mi-rama
+
+# 3. Borra la rama remota (si no lo hiciste desde GitHub)
+git push origin --delete feature/mi-rama
+
+# 4. Limpia referencias a ramas remotas que ya no existen
+git fetch --prune
+```
+
+> `git fetch --prune` es útil cuando trabajas en equipo: elimina de tu lista local las ramas remotas que ya fueron borradas por otros.
+
+---
